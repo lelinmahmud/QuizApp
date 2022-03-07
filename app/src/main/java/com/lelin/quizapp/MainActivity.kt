@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lelin.quizapp.screens.QuestionViewModel
+import com.lelin.quizapp.screens.QuizApp
 import com.lelin.quizapp.ui.theme.QuizAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,16 +35,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun QuizApp(viewModel: QuestionViewModel = hiltViewModel()){
-    Questions(viewModel)
-}
 
-@Composable
-fun Questions(viewModel: QuestionViewModel) {
-    val questions = viewModel.data.value.data?.toMutableList()
-    Log.e("TAG", "Questions: ${questions?.size}", )
-}
+
 
 @Preview(showBackground = true)
 @Composable
