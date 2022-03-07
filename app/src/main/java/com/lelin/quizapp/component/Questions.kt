@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -33,6 +34,10 @@ import com.lelin.quizapp.util.AppColors
 
 @Composable
 fun Questions(viewModel: QuestionViewModel) {
+
+    val questionIndex = remember {
+        mutableStateOf(0)
+    }
     val questions = viewModel.data.value.data?.toMutableList()
     if (viewModel.data.value.loading == true){
         Column(
@@ -48,8 +53,16 @@ fun Questions(viewModel: QuestionViewModel) {
     }
 
     else{
+        val question =  try {
+             questions?.get(questionIndex.value)
+        }catch (exception: Exception){
+            null
+        }
         if (questions != null){
-            QuestionDisplay(question = questions[0])
+            QuestionDisplay(question = question!!,questionIndex = questionIndex,viewModel = viewModel){
+                i ->
+                questionIndex.value = questionIndex.value+1
+            }
         }
     }
     Log.e("TAG", "Questions: ${questions?.size}", )
@@ -59,8 +72,8 @@ fun Questions(viewModel: QuestionViewModel) {
 @Composable
 fun QuestionDisplay(
     question: QuestionItem,
-//    questionIndex: MutableState<Int>,
-  //  viewModel: QuestionViewModel,
+    questionIndex: MutableState<Int>,
+    viewModel: QuestionViewModel,
     onNextClicked: (Int) ->Unit ={}
 ){
 
@@ -99,7 +112,7 @@ fun QuestionDisplay(
             verticalArrangement = Arrangement.Top
             ) {
 
-            QuestionTracker()
+            QuestionTracker(counter = questionIndex.value)
             DrawDottedLine(pathEffect = pathEffect )
             Column {
                 Text(text = question.question,
@@ -149,9 +162,44 @@ fun QuestionDisplay(
                             }
 
                         ))
-                        Text(text = answerText)
+
+                        val anotatedString = buildAnnotatedString {
+                            withStyle(style = SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 17.sp,
+                                color = if (correctAnswerState.value == true && index == answerState.value){
+                                    Color.Green
+                                }
+                                else if(correctAnswerState.value == false && index == answerState.value){
+                                    Color.Red
+
+                                }
+                                else{
+                                    AppColors.mOffWhite
+
+                                }
+                            )
+
+                            )
+                            {
+                                append(answerText)
+                            }
+                        }
+
+                        Text(text = anotatedString,modifier = Modifier.padding(6.dp))
                     }
                 }
+            }
+
+            Button(onClick = {onNextClicked(questionIndex.value)},
+            modifier = Modifier
+                .padding(3.dp)
+                .align(alignment = Alignment.CenterHorizontally),
+            shape = RoundedCornerShape(corner = CornerSize(34.dp)),
+            colors = ButtonDefaults.buttonColors(backgroundColor = AppColors.mLightBlue)) {
+                Text(text = "Next", modifier = Modifier.padding(4.dp),
+                color = AppColors.mOffWhite,
+                fontSize = 17.sp)
             }
             
 
