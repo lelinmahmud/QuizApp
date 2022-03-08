@@ -31,4 +31,8 @@ class QuestionViewModel @Inject constructor(private val questionRepository: Ques
         }
     }
 
+    fun getTotalQuestionCount(): Int{
+        return data.value.data?.toMutableList()?.size ?: 0
+    }
+
 }
